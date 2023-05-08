@@ -1,22 +1,50 @@
-const jwt = require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
 module.exports = {
   verifyJwt: (req, res, next) => {
     const token = req.headers["authorization"];
-    console.log(token)
+    console.log(token);
     // const token = authHeader && authHeader.split(" ")[1];
 
-    if (token=='null') {
-      return res.status(401).json({status:false,message:'Unauthorized'});
+    if (token == "null") {
+      return res
+        .status(401)
+        .json({ invalidToken: true, message: "Unauthorized" });
     }
 
-    jwt.verify(token, "secret_ke", (err, decoded) => {
+    jwt.verify(token, "access_secret_key", (err, decoded) => {
       if (err) {
-        console.log(err)
-        return res.status(403).json({status:false,message:'"Forbidden',err});
+        console.log(err);
+        return res
+          .status(403)
+          .json({ invalidToken: true, message: '"Forbidden', err });
       }
-      console.log(decoded)
+      console.log(decoded);
       req.user = decoded;
       next();
     });
+  },
+  generateAccessToken: (userExist) => {
+    try {
+      const accessToken = jwt.sign(
+        { username: userExist?.username, email: userExist?.email },
+        "access_secret_key",
+        { expiresIn: "20s" }
+      )
+      return accessToken
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+  generateRefreshToken:(userExist) => {
+    try {
+      const refreshToken = jwt.sign(
+        { username: userExist?.username, email: userExist?.email },
+        "refresh_secret_key",
+        { expiresIn: "60s" }
+      )
+      return refreshToken
+    } catch (error) {
+      throw new Error(error);
+    }
   },
 };

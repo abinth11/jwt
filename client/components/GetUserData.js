@@ -12,34 +12,37 @@ const GetUserData = () => {
       await fetch("http://localhost:3000/get-user-data", {
         method: "GET",
         headers: {
-          Authorization: `${token}`,
+          authorization: `${token}`,
         },
       })
         .then(async (response) => {
           console.log(response);
           const parsedResponse = await response.json();
-          if(!parsedResponse?.status){
-            alert(parsedResponse?.message)
-            return 
+          console.log(parsedResponse);
+          if (parsedResponse?.invalidToken) {
+            if (response.status === 401) {
+              alert(parsedResponse?.message);
+            } else {
+              alert(parsedResponse?.err?.message);
+            }
+            return true;
           } else {
             const { data } = parsedResponse;
-          console.log(parsedResponse);
-          if (data) {
-            alert(parsedResponse?.successMessage);
-            setUserData(data);
-          } else {
-            alert("unable to get the user data");
+            if (data) {
+              handleShowData();
+              alert(parsedResponse?.successMessage);
+              setUserData(data);
+            } else {
+              alert("unable to get the user data");
+            }
           }
-
-          }
-          
         })
         .catch((err) => {
           console.log(err);
         });
-      handleShowData();
-    }
+    } else {
     handleShowData();
+    }
   };
 
   return (

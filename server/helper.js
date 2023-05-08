@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
-const jwt = require('jsonwebtoken')
 const {user} = require("./schema.js");
+const JWTHelpers = require('./jwt.js');
+const jwt = require('jsonwebtoken')
 module.exports = {
   registerUser: async (userInfo) => {
     try {
@@ -39,33 +40,39 @@ module.exports = {
           status: false,
           Message: "User does not exist please enter valid email",
         };
-      } else if (userExist?.blocked) {
-        return {
-          status: false,
-          blocked: true,
-          Message: "User is blocked",
-        };
       }
       const hashedPassword = userExist?.password;
       const match = await bcrypt.compare(password, hashedPassword);
       if (match) {
-        const token = jwt.sign({username:userExist?.username,email:userExist?.email }, 'secret_key', { expiresIn: '1h' });
-        console.log(token)
+        const accessToken =  JWTHelpers.generateAccessToken(userExist) 
+        const refreshToken =  JWTHelpers.generateRefreshToken(userExist)
+        // refreshTokens.push(refreshToken);
+        await user.updateOne({ email: username }, {
+          $push: {
+            tokens: refreshToken
+          }
+        });
         return {
           status: true,
-          token,
+          accessToken,
+          refreshToken,
           Message: "Successfully logged in",
         };
       } else {
         return {
           status: false,
-          token:null,
+          accessToken:null,
+          refreshToken:null,
           Message: "Entered wrong password",
         };
       }
     } catch (error) {
       throw new Error(error);
     }
+  },
+  refreshToken:(refreshToken)=>{
+    
+
   },
   getUserData:async(email) =>{
     try {
