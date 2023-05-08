@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const connect = async () => {
   const url = "mongodb://localhost:27017";
-  const dbName = 'freshBite';
+  const dbName = 'jwt';
 
   try {
     await mongoose.connect(url, {

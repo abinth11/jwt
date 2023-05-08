@@ -4,7 +4,7 @@ import LoginFrom from "./components/Login.js";
 import Navbar from "./components/Header.js";
 import Home from "./components/Home.js";
 import SignUpForm from "./components/SignUp.js";
-import GetUserData from "./components/getData.js";
+import GetUserData from "./components/GetUserData.js";
 import {
   createBrowserRouter,
   Outlet,

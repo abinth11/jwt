@@ -16,7 +16,29 @@ const LoginFrom = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(`Username: ${username}, Password: ${password}`);
+    const formData = {
+      username,
+      password
+    }
+    fetch('http://localhost:3000/user-login', {
+      method: "POST",
+      body: JSON.stringify(formData),
+      headers: {
+          'Content-Type': 'application/json'
+      }
+  }).then(async response => {
+      const parsedResponse = await response.json()
+      const {data} = parsedResponse
+      if(!data?.status){
+          alert(data?.Message)
+      }else {
+        alert('successfully logged in')
+        localStorage.setItem('token', data?.token);
+      }
+      console.log(parsedResponse)
+  }).catch(err => {
+      console.log(err)
+  })
   };
 
   return (
